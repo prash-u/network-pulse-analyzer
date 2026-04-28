@@ -9,10 +9,10 @@ import { InstallButton } from "@/components/InstallButton";
 export const AppLayout = ({ children }: { children: ReactNode }) => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full bg-transparent">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-md">
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-border bg-[hsl(214_68%_7%_/_0.72)] px-4 backdrop-blur-xl">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
               <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
