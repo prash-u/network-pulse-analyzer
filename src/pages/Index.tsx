@@ -4,12 +4,15 @@ import {
   ArrowRight,
   BrainCircuit,
   Building2,
+  CircleGauge,
   Database,
   Dna,
   GitBranch,
+  HeartPulse,
   Layers3,
   Microscope,
   Network,
+  Orbit,
   ScanSearch,
   ShieldCheck,
   Smartphone,
@@ -96,6 +99,62 @@ const provenance = [
     icon: ScanSearch,
     title: "Current input scope",
     text: "Today the product is strongest as a cohort-driven exploration surface. It ships with curated reference programs rather than full custom upload and preprocessing workflows.",
+  },
+];
+
+const analyticalFrame = [
+  {
+    label: "Who",
+    text: "Research teams, translational reviewers, and biotech strategy groups that need a fast biological read without opening a full wet-lab pipeline.",
+  },
+  {
+    label: "What",
+    text: "A DEG-first network analysis surface that combines cohort signal, interaction structure, and pathway evidence in one place.",
+  },
+  {
+    label: "When",
+    text: "Use it early in hypothesis generation, indication review, demo sessions, internal prioritization, and cross-functional disease-program discussions.",
+  },
+  {
+    label: "Where",
+    text: "Best suited to browser-native review environments: lab meetings, translational calls, diligence rooms, and internal portfolio reviews.",
+  },
+  {
+    label: "Why",
+    text: "Because raw DEG tables are too flat, and pathway spreadsheets are too fragmented, to quickly explain mechanism-level consequence.",
+  },
+  {
+    label: "How",
+    text: "Start from a reference cohort, filter expression strength, inspect hubs, validate pathway dominance, and export the evidence slice that supports the current readout.",
+  },
+];
+
+const programSnapshots = datasets.slice(0, 3).map((dataset) => ({
+  id: dataset.id,
+  name: dataset.name,
+  category: dataset.category,
+  source: dataset.source,
+  strongestGene: [...dataset.genes].sort((a, b) => Math.abs(b.log2FC) - Math.abs(a.log2FC))[0],
+  leadPathway: [...dataset.pathways].sort((a, b) => a.pValue - b.pValue)[0],
+  edgeDensity: `${dataset.edges.length} edges / ${dataset.genes.length} genes`,
+  color: dataset.color,
+}));
+
+const operatingSignals = [
+  {
+    icon: CircleGauge,
+    title: "Signal intensity",
+    text: "Rank cohorts by fold-change amplitude, DEG balance, and connectivity so the most consequential biology surfaces first.",
+  },
+  {
+    icon: Orbit,
+    title: "Hub discovery",
+    text: "Use interaction density and neighborhood structure to identify the genes most likely to anchor mechanism-level interpretation.",
+  },
+  {
+    icon: HeartPulse,
+    title: "Pathway pressure",
+    text: "Translate gene-level movement into pathway-level language fast enough for translational reviews and strategy sessions.",
   },
 ];
 
@@ -286,6 +345,96 @@ const Index = () => {
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.text}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="mt-4 glass-panel p-6 md:p-7">
+          <p className="eyebrow">Analytical frame</p>
+          <h2 className="mt-2 text-[clamp(1.8rem,3vw,2.7rem)] font-semibold">Who, what, when, where, why, and how this product is meant to be used.</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+            This section exists because the product now has enough shape to define its operating frame clearly. It should help users understand not just what the analyzer shows, but the role it plays in a real scientific workflow.
+          </p>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {analyticalFrame.map((item) => (
+              <div key={item.label} className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <div className="text-[11px] uppercase tracking-[0.22em] text-primary">{item.label}</div>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.text}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 rounded-[1.7rem] border border-primary/20 bg-primary/[0.08] p-5">
+            <div className="text-[11px] uppercase tracking-[0.22em] text-primary">Conclusion</div>
+            <p className="mt-3 max-w-4xl text-sm leading-7 text-foreground/90">
+              Network Pulse Analyzer is most valuable when a team needs to move from transcriptomic change to mechanism-level narrative quickly. It is not the final answer engine, but it is a strong front-end analytical surface for deciding what deserves deeper experimental, clinical, or commercial attention next.
+            </p>
+          </div>
+        </section>
+
+        <section className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+          <div className="glass-panel p-6 md:p-7">
+            <p className="eyebrow">Program snapshots</p>
+            <h2 className="mt-2 text-[clamp(1.8rem,3vw,2.7rem)] font-semibold">Three disease stories, already shaped for analysis.</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+              This section exists because the product has real built-in programs, not placeholder demo cards. Each cohort already contains enough structure to tell a useful mechanistic story.
+            </p>
+
+            <div className="mt-6 grid gap-4 xl:grid-cols-3">
+              {programSnapshots.map((snapshot) => (
+                <Link
+                  key={snapshot.id}
+                  to={`/workspace?dataset=${snapshot.id}`}
+                  className="rounded-[1.7rem] border border-white/10 bg-white/5 p-5 transition-smooth hover:border-primary/40 hover:bg-white/[0.07]"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">{snapshot.category}</div>
+                    <span
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ background: `hsl(${snapshot.color})`, boxShadow: `0 0 10px hsl(${snapshot.color} / 0.75)` }}
+                    />
+                  </div>
+                  <h3 className="mt-3 text-2xl font-semibold text-foreground">{snapshot.name}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{snapshot.source}</p>
+
+                  <div className="mt-5 space-y-3">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Strongest shift</div>
+                      <div className="mt-1 text-sm font-semibold text-foreground">
+                        {snapshot.strongestGene.symbol}
+                        <span className="ml-2 font-mono text-primary">{snapshot.strongestGene.log2FC.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Lead pathway</div>
+                      <div className="mt-1 text-sm font-semibold text-foreground">{snapshot.leadPathway.name}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Network coverage</div>
+                      <div className="mt-1 text-sm text-muted-foreground">{snapshot.edgeDensity}</div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="glass-panel p-6 md:p-7">
+            <p className="eyebrow">Operating signals</p>
+            <h2 className="mt-2 text-[clamp(1.8rem,3vw,2.7rem)] font-semibold">A denser analytical surface, not just a prettier one.</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              These are the signal types the product should keep getting better at exposing. They map directly to how scientists and strategy teams read the workspace.
+            </p>
+
+            <div className="mt-6 space-y-4">
+              {operatingSignals.map((signal) => (
+                <div key={signal.title} className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                  <signal.icon className="h-5 w-5 text-primary" />
+                  <h3 className="mt-3 text-lg font-semibold text-foreground">{signal.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{signal.text}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>
