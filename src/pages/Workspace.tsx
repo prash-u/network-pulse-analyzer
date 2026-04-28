@@ -69,6 +69,9 @@ const Workspace = () => {
               {dataset.name}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground font-mono">{dataset.source} · n={dataset.samples}</p>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              Translational view of the cohort: inspect network hubs, differential-expression balance, and pathway candidates from one interactive surface.
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Select value={dataset.id} onValueChange={(v) => setParams({ dataset: v })}>
@@ -111,7 +114,7 @@ const Workspace = () => {
             <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-border">
               <div>
                 <h2 className="font-display text-lg font-semibold">Interaction network</h2>
-                <p className="text-xs text-muted-foreground">Drag the slider to filter by absolute log2 fold change.</p>
+                <p className="text-xs text-muted-foreground">Filter by absolute log2 fold change, then inspect hubs and local neighbourhood structure.</p>
               </div>
               <div className="flex items-center gap-3 min-w-[260px]">
                 <span className="text-xs text-muted-foreground whitespace-nowrap">|log2FC| ≥ {fcThreshold[0].toFixed(1)}</span>
@@ -231,6 +234,12 @@ const Workspace = () => {
                     <div className="text-xs uppercase tracking-wider text-muted-foreground">Samples</div>
                     <div className="font-mono text-sm mt-1">n = {dataset.samples}</div>
                   </div>
+                </div>
+                <div className="rounded-md border border-border/60 p-3">
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Translational fit</div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Suitable for research demonstration, translational discussion, and commercial storytelling around pathway prioritization, disease mechanism, and candidate target framing.
+                  </p>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Sample data is curated for demonstration purposes. Connect your own counts matrix

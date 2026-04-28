@@ -3,7 +3,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Github, Download } from "lucide-react";
+import { Activity } from "lucide-react";
 import { InstallButton } from "@/components/InstallButton";
 
 export const AppLayout = ({ children }: { children: ReactNode }) => {
@@ -15,9 +15,10 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-md">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
-              <span className="hidden sm:inline text-sm text-muted-foreground">
-                Biological network analysis platform
-              </span>
+              <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+                <Activity className="h-3.5 w-3.5 text-primary" />
+                <span>Translational network intelligence workspace</span>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <InstallButton />

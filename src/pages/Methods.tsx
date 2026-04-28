@@ -5,23 +5,23 @@ import { GitBranch, Network, Sigma, FileText } from "lucide-react";
 const sections = [
   {
     icon: Network,
-    title: "Network construction",
-    body: "Protein–protein interaction subnetworks are seeded from differentially expressed genes and expanded using a curated interaction backbone (STRING / BioGRID style). Edge weights reflect combined confidence scores.",
+    title: "Network assembly",
+    body: "Interaction views are seeded from differentially expressed genes and constrained to an illustrative protein-protein interaction backbone. Edge scores create a confidence-weighted picture of how candidate genes cluster into mechanisms.",
   },
   {
     icon: Sigma,
-    title: "Topology metrics",
-    body: "Each node carries a degree centrality score that drives visual size. The layout algorithm minimizes a Coulomb-style repulsion against Hooke-style spring attraction, with edge stiffness scaled by interaction confidence.",
+    title: "Topology scoring",
+    body: "Node size reflects degree-aware prominence while the force layout balances repulsion, spring attraction, and center bias. The result is optimized for interpretable triage rather than publication-grade graph rendering.",
   },
   {
     icon: GitBranch,
-    title: "Pathway enrichment",
-    body: "Hypergeometric over-representation is reported against KEGG, Reactome, and GO biological process annotations. p-values are Benjamini–Hochberg adjusted across the full term universe of the ontology.",
+    title: "Pathway prioritization",
+    body: "Over-representation outputs are surfaced against KEGG, Reactome, and GO biological process terms. Adjusted p-values and gene overlap help teams move from expression signal to mechanism hypotheses quickly.",
   },
   {
     icon: FileText,
-    title: "Reproducibility",
-    body: "Every workspace state is encoded in the URL. Sample datasets are versioned and cited to public repositories (GEO, TCGA) — citations available in each dataset's Info panel.",
+    title: "Traceability",
+    body: "Workspace state is URL-addressable, sample cohorts keep public-source attribution, and exported DEG tables preserve the filtered context used to generate the analytical view.",
   },
 ];
 
@@ -30,9 +30,9 @@ const Methods = () => {
     <AppLayout>
       <div className="container py-12 max-w-4xl">
         <p className="text-sm font-medium text-primary uppercase tracking-wider">Methods</p>
-        <h1 className="mt-2 font-display text-4xl md:text-5xl font-semibold">How the analysis works</h1>
+        <h1 className="mt-2 font-display text-4xl md:text-5xl font-semibold">How the analytical layer is structured</h1>
         <p className="mt-3 text-muted-foreground">
-          A transparent pipeline so educators, clinicians and industry researchers can trust the output.
+          A concise explanation for research teams, translational reviewers, and commercial stakeholders who need to understand what the workspace is actually surfacing.
         </p>
 
         <div className="mt-10 space-y-4">
@@ -49,6 +49,13 @@ const Methods = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        <div className="mt-10 rounded-2xl border border-border/70 bg-muted/30 p-6">
+          <h2 className="font-display text-2xl font-semibold">Interpretation notes</h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            This product is positioned as a translational exploration surface. It is strong enough for research framing, educational walkthroughs, and commercial storytelling, but any clinically consequential use would still require validated pipelines, governance, and domain-specific review outside the demo layer.
+          </p>
         </div>
       </div>
     </AppLayout>

@@ -1,7 +1,7 @@
 {
-  "name": "NetworkAnalyst",
-  "short_name": "NetworkAnalyst",
-  "description": "Biological network analysis for research, clinical and commercial applications.",
+  "name": "Network Pulse Analyzer",
+  "short_name": "Net Pulse",
+  "description": "Translational biological network analysis for research, clinical, and commercial workflows.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

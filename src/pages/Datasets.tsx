@@ -9,11 +9,10 @@ const Datasets = () => {
     <AppLayout>
       <div className="container py-12">
         <div className="max-w-2xl">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider">Sample data</p>
-          <h1 className="mt-2 font-display text-4xl md:text-5xl font-semibold">Curated DEG datasets</h1>
+          <p className="text-sm font-medium text-primary uppercase tracking-wider">Reference cohorts</p>
+          <h1 className="mt-2 font-display text-4xl md:text-5xl font-semibold">Curated transcriptomic starting points</h1>
           <p className="mt-3 text-muted-foreground">
-            Six pre-loaded transcriptomes spanning neurodegenerative, metabolic, oncology,
-            cardiovascular and infectious disease categories — all interactive, no account required.
+            Six pre-loaded disorder programs spanning neurodegeneration, metabolism, oncology, cardiovascular disease, and infection. Each cohort is tuned to demonstrate how the analyzer moves from signal to network-level interpretation.
           </p>
         </div>
 

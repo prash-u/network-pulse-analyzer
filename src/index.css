@@ -4,13 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NetworkAnalyst.ca — biological network analysis platform.
-   Dark-first scientific aesthetic. All colors HSL. */
+/* Network Pulse Analyzer
+   Scientific interface with cinematic pulse-project styling. All colors HSL. */
 
 @layer base {
   :root {
-    --background: 200 30% 98%;
-    --foreground: 200 50% 8%;
+    --background: 210 33% 98%;
+    --foreground: 205 46% 8%;
 
     --card: 0 0% 100%;
     --card-foreground: 200 50% 8%;
@@ -19,19 +19,19 @@
     --popover-foreground: 200 50% 8%;
 
     /* Deep teal */
-    --primary: 186 95% 30%;
+    --primary: 191 95% 31%;
     --primary-foreground: 200 30% 98%;
-    --primary-glow: 186 95% 50%;
+    --primary-glow: 191 100% 58%;
 
     /* Electric cyan accent */
-    --accent: 190 100% 50%;
+    --accent: 199 100% 54%;
     --accent-foreground: 200 50% 8%;
 
-    --secondary: 200 25% 94%;
-    --secondary-foreground: 200 50% 12%;
+    --secondary: 205 24% 94%;
+    --secondary-foreground: 205 50% 12%;
 
-    --muted: 200 20% 95%;
-    --muted-foreground: 200 15% 42%;
+    --muted: 205 22% 95%;
+    --muted-foreground: 205 14% 40%;
 
     --destructive: 350 80% 55%;
     --destructive-foreground: 0 0% 100%;
@@ -40,19 +40,19 @@
     --warning: 38 95% 55%;
     --magenta: 320 85% 60%;
 
-    --border: 200 25% 88%;
-    --input: 200 25% 90%;
-    --ring: 186 95% 40%;
+    --border: 206 24% 88%;
+    --input: 206 24% 90%;
+    --ring: 191 95% 40%;
 
     --radius: 0.75rem;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(186 95% 28%), hsl(190 100% 45%));
-    --gradient-hero: linear-gradient(135deg, hsl(200 60% 6%) 0%, hsl(195 70% 12%) 50%, hsl(186 90% 18%) 100%);
-    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(190 100% 50% / 0.25), transparent 70%);
-    --gradient-mesh: radial-gradient(at 20% 20%, hsl(186 95% 40% / 0.15) 0px, transparent 50%),
+    --gradient-primary: linear-gradient(135deg, hsl(191 95% 28%), hsl(202 100% 52%));
+    --gradient-hero: linear-gradient(135deg, hsl(217 66% 7%) 0%, hsl(205 70% 11%) 48%, hsl(191 90% 17%) 100%);
+    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(191 100% 55% / 0.24), transparent 70%);
+    --gradient-mesh: radial-gradient(at 20% 20%, hsl(191 95% 40% / 0.16) 0px, transparent 50%),
                      radial-gradient(at 80% 30%, hsl(320 85% 60% / 0.12) 0px, transparent 50%),
-                     radial-gradient(at 50% 90%, hsl(190 100% 50% / 0.12) 0px, transparent 50%);
+                     radial-gradient(at 50% 90%, hsl(202 100% 56% / 0.12) 0px, transparent 50%);
 
     /* Shadows */
     --shadow-glow: 0 0 40px hsl(190 100% 50% / 0.25);
@@ -64,55 +64,64 @@
     --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
     /* Sidebar */
-    --sidebar-background: 200 40% 7%;
-    --sidebar-foreground: 200 20% 80%;
-    --sidebar-primary: 190 100% 50%;
+    --sidebar-background: 217 64% 6%;
+    --sidebar-foreground: 213 45% 92%;
+    --sidebar-primary: 191 100% 70%;
     --sidebar-primary-foreground: 200 60% 6%;
-    --sidebar-accent: 200 35% 12%;
-    --sidebar-accent-foreground: 200 20% 95%;
-    --sidebar-border: 200 35% 14%;
-    --sidebar-ring: 190 100% 50%;
+    --sidebar-accent: 214 48% 11%;
+    --sidebar-accent-foreground: 213 45% 97%;
+    --sidebar-border: 214 38% 14%;
+    --sidebar-ring: 191 100% 70%;
   }
 
   .dark {
-    --background: 200 60% 5%;
-    --foreground: 200 20% 95%;
+    --background: 217 64% 5%;
+    --foreground: 213 45% 95%;
 
-    --card: 200 50% 8%;
-    --card-foreground: 200 20% 95%;
+    --card: 215 55% 8%;
+    --card-foreground: 213 45% 95%;
 
-    --popover: 200 50% 8%;
-    --popover-foreground: 200 20% 95%;
+    --popover: 215 55% 8%;
+    --popover-foreground: 213 45% 95%;
 
-    --primary: 190 100% 50%;
+    --primary: 191 100% 60%;
     --primary-foreground: 200 60% 6%;
-    --primary-glow: 190 100% 65%;
+    --primary-glow: 191 100% 74%;
 
-    --accent: 186 95% 45%;
+    --accent: 199 95% 58%;
     --accent-foreground: 200 60% 6%;
 
-    --secondary: 200 35% 14%;
-    --secondary-foreground: 200 20% 95%;
+    --secondary: 214 34% 14%;
+    --secondary-foreground: 213 45% 95%;
 
-    --muted: 200 35% 12%;
-    --muted-foreground: 200 15% 65%;
+    --muted: 214 34% 12%;
+    --muted-foreground: 214 14% 68%;
 
     --destructive: 350 80% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 35% 16%;
-    --input: 200 35% 16%;
-    --ring: 190 100% 50%;
+    --border: 214 34% 16%;
+    --input: 214 34% 16%;
+    --ring: 191 100% 60%;
   }
 }
 
 @layer base {
   * { @apply border-border; }
-  html { font-family: 'Inter', system-ui, sans-serif; }
+  html {
+    min-height: 100%;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
   body {
     @apply bg-background text-foreground antialiased;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at top left, hsl(191 100% 56% / 0.08), transparent 24%),
+      radial-gradient(circle at 84% 8%, hsl(224 100% 66% / 0.07), transparent 20%),
+      linear-gradient(180deg, hsl(var(--background)), hsl(206 42% 97%));
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
   }
+  #root { min-height: 100vh; }
   h1, h2, h3, h4 {
     font-family: 'Fraunces', Georgia, serif;
     letter-spacing: -0.02em;

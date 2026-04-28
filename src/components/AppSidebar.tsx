@@ -1,6 +1,6 @@
 import { NavLink } from "@/components/NavLink";
 import { Link } from "react-router-dom";
-import { Network, LayoutGrid, Database, FlaskConical, BookOpen, Sparkles, Github } from "lucide-react";
+import { Network, LayoutGrid, Database, FlaskConical, BookOpen, Sparkles } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -41,8 +41,8 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
-              <span className="font-display text-base font-semibold text-sidebar-foreground">NetworkAnalyst</span>
-              <span className="text-[10px] uppercase tracking-wider text-sidebar-foreground/50">.ca</span>
+              <span className="font-display text-base font-semibold text-sidebar-foreground">Network Pulse</span>
+              <span className="text-[10px] uppercase tracking-[0.28em] text-sidebar-foreground/50">Analyzer</span>
             </div>
           )}
         </Link>
@@ -99,9 +99,9 @@ export function AppSidebar() {
         {!collapsed ? (
           <div className="rounded-md bg-sidebar-accent/50 p-3 text-xs text-sidebar-foreground/70">
             <div className="mb-1 flex items-center gap-1.5 font-medium text-sidebar-primary">
-              <Sparkles className="h-3 w-3" /> v2.0 preview
+              <Sparkles className="h-3 w-3" /> translational build
             </div>
-            Faster layouts, mobile-first, install as PWA.
+            Research-grade exploration with clinical and commercial framing.
           </div>
         ) : (
           <Sparkles className="h-4 w-4 mx-auto text-sidebar-primary" />
