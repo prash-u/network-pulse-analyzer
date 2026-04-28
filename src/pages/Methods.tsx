@@ -52,6 +52,13 @@ const Methods = () => {
         </div>
 
         <div className="mt-10 rounded-2xl border border-border/70 bg-muted/30 p-6">
+          <h2 className="font-display text-2xl font-semibold">Data provenance</h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Current reference cohorts are sourced from publicly cited transcriptomic studies named in each dataset record, while the pathway layer is expressed through KEGG, Reactome, and GO biological process terminology. The interaction graph is an illustrative curated backbone designed for translational review rather than a claim of exhaustive molecular ground truth.
+          </p>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-border/70 bg-muted/30 p-6">
           <h2 className="font-display text-2xl font-semibold">Interpretation notes</h2>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             This product is positioned as a translational exploration surface. It is strong enough for research framing, educational walkthroughs, and commercial storytelling, but any clinically consequential use would still require validated pipelines, governance, and domain-specific review outside the demo layer.

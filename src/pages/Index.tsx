@@ -5,9 +5,12 @@ import {
   BrainCircuit,
   Building2,
   Database,
+  Dna,
   GitBranch,
+  Layers3,
   Microscope,
   Network,
+  ScanSearch,
   ShieldCheck,
   Smartphone,
   Stethoscope,
@@ -55,6 +58,44 @@ const capabilities = [
     icon: ShieldCheck,
     title: "Private-by-default demoing",
     text: "Browser-native analysis flow that is easy to share without turning the product into a data-handling risk.",
+  },
+];
+
+const workflow = [
+  {
+    title: "Choose a cohort",
+    text: "Start from a disease program with curated genes, interaction edges, and ranked pathways already loaded.",
+  },
+  {
+    title: "Focus the signal",
+    text: "Filter by fold change, isolate the strongest expression changes, and keep the graph readable during live review.",
+  },
+  {
+    title: "Read mechanism fast",
+    text: "Move between hub structure and pathway enrichment without switching products or exporting intermediate files.",
+  },
+];
+
+const provenance = [
+  {
+    icon: Dna,
+    title: "Expression cohorts",
+    text: "Reference programs are derived from public transcriptomic studies cited by source, including GEO-style and TCGA-style cohorts represented in the dataset metadata.",
+  },
+  {
+    icon: Network,
+    title: "Interaction layer",
+    text: "Network views use a curated illustrative interaction backbone to simulate the kind of protein-protein reasoning users expect from translational network analysis.",
+  },
+  {
+    icon: Layers3,
+    title: "Pathway knowledge",
+    text: "Mechanism ranking is framed through KEGG, Reactome, and GO biological process terms so pathway language stays familiar to research and translational teams.",
+  },
+  {
+    icon: ScanSearch,
+    title: "Current input scope",
+    text: "Today the product is strongest as a cohort-driven exploration surface. It ships with curated reference programs rather than full custom upload and preprocessing workflows.",
   },
 ];
 
@@ -121,10 +162,10 @@ const Index = () => {
 
         <section className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
           <div className="glass-panel p-6 md:p-7">
-            <p className="eyebrow">Positioning</p>
-            <h2 className="mt-2 text-[clamp(1.8rem,3vw,2.7rem)] font-semibold">A product surface, not a clone.</h2>
+            <p className="eyebrow">Who it serves</p>
+            <h2 className="mt-2 text-[clamp(1.8rem,3vw,2.7rem)] font-semibold">One interface, three real use cases.</h2>
             <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-              This should feel like its own translational analysis platform. The first screen now leads with the product, the analytical promise, and the working surface rather than generic light-section marketing.
+              This section exists because the same analysis surface has to hold up in different rooms: research review, translational discussion, and commercial storytelling.
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -140,6 +181,10 @@ const Index = () => {
 
           <div className="glass-panel p-6 md:p-7">
             <p className="eyebrow">Capabilities</p>
+            <h2 className="mt-2 text-[clamp(1.8rem,3vw,2.7rem)] font-semibold">Only the layers the product actually has.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              These are the core product surfaces that justify dedicated explanation on the page today. Anything thinner should stay out of the landing page until the tool grows.
+            </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {capabilities.map((capability) => (
                 <div key={capability.title} className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
@@ -185,12 +230,17 @@ const Index = () => {
           </div>
 
           <div className="glass-panel p-6 md:p-7">
-            <p className="eyebrow">Workspace preview</p>
-            <div className="mt-4 rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(5,12,24,0.7),rgba(3,8,18,0.92))] p-5">
+            <p className="eyebrow">How it works</p>
+            <h2 className="mt-2 text-[clamp(1.8rem,3vw,2.7rem)] font-semibold">A three-step workflow that matches the actual tool.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              The analyzer really does three things well today: it loads a cohort, lets you focus the signal, and helps you read network-plus-pathway context quickly. That is enough to justify this final section.
+            </p>
+
+            <div className="mt-5 rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(5,12,24,0.7),rgba(3,8,18,0.92))] p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <div className="text-sm font-semibold text-foreground">Network-driven cohort review</div>
-                  <div className="mt-1 text-sm text-muted-foreground">Choose a program, filter signal, inspect hubs, validate pathway pressure.</div>
+                  <div className="mt-1 text-sm text-muted-foreground">From DEG signal to interaction structure to pathway interpretation.</div>
                 </div>
                 <span className="status-chip !normal-case !tracking-normal">
                   <BrainCircuit className="mr-1.5 h-3.5 w-3.5" />
@@ -199,14 +249,10 @@ const Index = () => {
               </div>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                {[
-                  ["Expression", "Threshold the cohort by |log2FC| and keep only the strongest signal in view."],
-                  ["Network", "Highlight neighbours and visually rank interaction hubs at a glance."],
-                  ["Pathways", "Inspect ranked terms beside the active network instead of switching tools."],
-                ].map(([title, text]) => (
-                  <div key={title} className="rounded-[1.35rem] border border-white/10 bg-white/[0.04] p-4">
-                    <div className="text-sm font-semibold text-foreground">{title}</div>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
+                {workflow.map((step) => (
+                  <div key={step.title} className="rounded-[1.35rem] border border-white/10 bg-white/[0.04] p-4">
+                    <div className="text-sm font-semibold text-foreground">{step.title}</div>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{step.text}</p>
                   </div>
                 ))}
               </div>
@@ -222,6 +268,24 @@ const Index = () => {
                 </span>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="mt-4 glass-panel p-6 md:p-7">
+          <p className="eyebrow">Data provenance</p>
+          <h2 className="mt-2 text-[clamp(1.8rem,3vw,2.7rem)] font-semibold">What the analyzer knows, and where that knowledge comes from.</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+            This section earns its place because trust matters in this category. The product needs to be clear about its current biological inputs, network knowledge layers, and where the analytical vocabulary comes from.
+          </p>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {provenance.map((item) => (
+              <div key={item.title} className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <item.icon className="h-5 w-5 text-primary" />
+                <h3 className="mt-3 text-lg font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.text}</p>
+              </div>
+            ))}
           </div>
         </section>
       </main>

@@ -31,6 +31,15 @@ const Docs = () => {
           ))}
         </ol>
 
+        <Card className="mt-12 border-border/60 bg-white/[0.03]">
+          <CardContent className="p-6">
+            <h3 className="font-display text-xl font-semibold">Current scope</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              The current product is optimized for curated reference cohorts. It does not yet expose a full custom upload, ID harmonization, or upstream preprocessing flow, so the landing page and workspace intentionally center cohort-based exploration rather than pretending to be a complete omics ingestion platform.
+            </p>
+          </CardContent>
+        </Card>
+
         <Card className="mt-12 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
           <CardContent className="p-6 flex flex-wrap items-center justify-between gap-4">
             <div>
