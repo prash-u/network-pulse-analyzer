@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { datasets } from "@/data/datasets";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 const Datasets = () => {
@@ -14,6 +15,14 @@ const Datasets = () => {
           <p className="mt-3 text-muted-foreground">
             Six pre-loaded disorder programs spanning neurodegeneration, metabolism, oncology, cardiovascular disease, and infection. Each cohort is tuned to demonstrate how the analyzer moves from signal to network-level interpretation.
           </p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Each demo program currently uses a compact top-15 DEG layer plus curated edges and pathway terms so the product stays readable and interpretable during live review.
+          </p>
+          <div className="mt-5">
+            <Button asChild variant="outline">
+              <Link to="/intake">Create custom cohort <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+            </Button>
+          </div>
         </div>
 
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -33,6 +42,9 @@ const Datasets = () => {
                   <h3 className="mt-4 font-display text-2xl font-semibold">{d.name}</h3>
                   <p className="mt-1 text-xs font-mono text-muted-foreground">{d.source}</p>
                   <p className="mt-3 text-sm text-muted-foreground">{d.description}</p>
+                  <div className="mt-3 rounded-xl border border-border/60 bg-white/[0.03] px-3 py-2 text-xs text-muted-foreground">
+                    Top 15 representative DEGs in current demo cohort
+                  </div>
                   <div className="mt-5 flex items-center justify-between">
                     <div className="flex gap-3 text-xs text-muted-foreground">
                       <span><span className="font-semibold text-foreground">{d.genes.length}</span> DEGs</span>

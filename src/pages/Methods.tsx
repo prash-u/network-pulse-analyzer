@@ -56,6 +56,9 @@ const Methods = () => {
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             Current reference cohorts are sourced from publicly cited transcriptomic studies named in each dataset record, while the pathway layer is expressed through KEGG, Reactome, and GO biological process terminology. The interaction graph is an illustrative curated backbone designed for translational review rather than a claim of exhaustive molecular ground truth.
           </p>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            For readability and demo control, each built-in cohort currently operates on a compact representative top-15 DEG slice rather than a full transcriptome-wide result table.
+          </p>
         </div>
 
         <div className="mt-6 rounded-2xl border border-border/70 bg-muted/30 p-6">

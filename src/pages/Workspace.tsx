@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
-import { datasets, getDataset } from "@/data/datasets";
+import { datasets, getDataset, type Disorder } from "@/data/datasets";
 import { NetworkGraph } from "@/components/NetworkGraph";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,23 +10,51 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ArrowUpRight, ArrowDownRight, Search, Download, CircleGauge, Sparkles, Radar, Workflow } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Search, Download, CircleGauge, Sparkles, Radar, Workflow, FileText, GitFork, ListFilter, ExternalLink, Presentation, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { getCustomCohort, listCustomCohorts } from "@/lib/customCohorts";
+
+const inferSourceUrl = (dataset: Disorder) => {
+  if (dataset.sourceUrl) return dataset.sourceUrl;
+  if (dataset.source.startsWith("GSE")) {
+    const accession = dataset.source.split(" ")[0];
+    return `https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=${accession}`;
+  }
+  if (dataset.source.startsWith("TCGA")) {
+    return "https://portal.gdc.cancer.gov/";
+  }
+  return undefined;
+};
+
+const getGeneEvidenceUrl = (symbol: string) => `https://www.ncbi.nlm.nih.gov/gene/?term=${encodeURIComponent(symbol)}`;
+
+const getPathwayEvidenceUrl = (pathwayName: string, source: string) => {
+  if (source === "KEGG") return `https://www.genome.jp/dbget-bin/www_bfind?keywords=${encodeURIComponent(pathwayName)}`;
+  if (source === "Reactome") return `https://reactome.org/content/query?q=${encodeURIComponent(pathwayName)}`;
+  return `https://geneontology.org/search?query=${encodeURIComponent(pathwayName)}`;
+};
 
 const Workspace = () => {
+  const DEMO_GENE_CAP = 15;
   const [params, setParams] = useSearchParams();
   const datasetId = params.get("dataset") ?? datasets[0].id;
-  const dataset = getDataset(datasetId) ?? datasets[0];
+  const allDatasets = useMemo(() => [...datasets, ...listCustomCohorts()], []);
+  const dataset = useMemo(() => {
+    if (datasetId.startsWith("custom:")) return getCustomCohort(datasetId) ?? datasets[0];
+    return getDataset(datasetId) ?? datasets[0];
+  }, [datasetId]);
 
   const [fcThreshold, setFcThreshold] = useState([1.0]);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [compareId, setCompareId] = useState<string>(datasets[1]?.id ?? datasets[0].id);
+  const [focusedPathwayName, setFocusedPathwayName] = useState<string>("lead");
 
   const compareDataset = useMemo(() => {
     if (!compareId || compareId === dataset.id) return null;
+    if (compareId.startsWith("custom:")) return getCustomCohort(compareId);
     return getDataset(compareId) ?? null;
   }, [compareId, dataset.id]);
 
@@ -99,6 +127,26 @@ const Workspace = () => {
     return dataset.pathways.filter((pathway) => pathway.genes.includes(selectedGene.symbol));
   }, [dataset.pathways, selectedGene]);
 
+  const selectedGeneNeighbors = useMemo(() => {
+    if (!selectedGene) return [];
+    const neighborSymbols = new Set<string>();
+    filteredEdges.forEach((edge) => {
+      if (edge.source === selectedGene.symbol) neighborSymbols.add(edge.target);
+      if (edge.target === selectedGene.symbol) neighborSymbols.add(edge.source);
+    });
+
+    return filteredGenes
+      .filter((gene) => neighborSymbols.has(gene.symbol))
+      .map((gene) => ({
+        ...gene,
+        degree: degreeMap.get(gene.symbol) ?? 0,
+      }))
+      .sort((a, b) => {
+        if ((b.degree ?? 0) !== (a.degree ?? 0)) return (b.degree ?? 0) - (a.degree ?? 0);
+        return Math.abs(b.log2FC) - Math.abs(a.log2FC);
+      });
+  }, [degreeMap, filteredEdges, filteredGenes, selectedGene]);
+
   const comparisonMetrics = useMemo(() => {
     if (!compareDataset) return [];
     return [
@@ -169,6 +217,126 @@ const Workspace = () => {
     return `${dataset.shortName} vs ${compareDataset.shortName}: ${dataset.shortName} carries ${dataset.genes.length} DEGs and lead pathway ${leadPathway?.name ?? "none"}, while ${compareDataset.shortName} carries ${compareDataset.genes.length} DEGs with ${compareTopPathway.name} as its dominant pathway signal.`;
   }, [compareDataset, compareTopPathway, dataset, leadPathway]);
 
+  const focusedPathway = useMemo(() => {
+    if (focusedPathwayName === "lead") return leadPathway ?? null;
+    return dataset.pathways.find((pathway) => pathway.name === focusedPathwayName) ?? null;
+  }, [dataset.pathways, focusedPathwayName, leadPathway]);
+
+  const focusedPathwayGenes = useMemo(() => {
+    if (!focusedPathway) return [];
+    return focusedPathway.genes
+      .filter((symbol) => visibleSymbols.has(symbol))
+      .map((symbol) => filteredGenes.find((gene) => gene.symbol === symbol))
+      .filter((gene): gene is NonNullable<typeof gene> => Boolean(gene))
+      .sort((a, b) => Math.abs(b.log2FC) - Math.abs(a.log2FC));
+  }, [filteredGenes, focusedPathway, visibleSymbols]);
+
+  const focusedPathwayEdges = useMemo(() => {
+    if (!focusedPathway) return [];
+    const allowed = new Set(focusedPathway.genes);
+    return filteredEdges.filter((edge) => allowed.has(edge.source) && allowed.has(edge.target));
+  }, [filteredEdges, focusedPathway]);
+
+  const reportMarkdown = useMemo(() => {
+    const lines = [
+      `# ${dataset.name} report`,
+      "",
+      "## Cohort",
+      `- Source: ${dataset.source}`,
+      `- Category: ${dataset.category}`,
+      `- Samples: ${dataset.samples}`,
+      `- Gene scope: ${dataset.demoGeneCap ? `top ${dataset.demoGeneCap} representative DEGs included in this program` : "custom cohort with user-supplied gene table size"}`,
+      "",
+      "## Active analytical state",
+      `- |log2FC| threshold: ${fcThreshold[0].toFixed(1)}`,
+      `- Genes in current view: ${filteredGenes.length}/${dataset.genes.length}`,
+      `- Interactions in current view: ${filteredEdges.length}`,
+      `- Upregulated genes: ${upCount}`,
+      `- Downregulated genes: ${downCount}`,
+      `- Lead pathway: ${leadPathway?.name ?? "None"} (${leadPathway?.source ?? "N/A"})`,
+      "",
+      "## Conclusion",
+      analystConclusion,
+      "",
+      "## Top hub genes",
+      ...topHubGenes.map((gene) => `- ${gene.symbol}: degree ${gene.degree}, log2FC ${gene.log2FC.toFixed(2)}, adj.P ${gene.pAdj.toExponential(1)}`),
+      "",
+      "## Strongest expression shifts",
+      ...topShiftGenes.map((gene) => `- ${gene.symbol}: ${gene.name} (${gene.log2FC.toFixed(2)})`),
+      "",
+      "## Lead pathway genes in view",
+      ...(focusedPathwayGenes.length
+        ? focusedPathwayGenes.map((gene) => `- ${gene.symbol}: ${gene.log2FC.toFixed(2)}`)
+        : ["- No focused pathway genes remain under the current threshold."]),
+    ];
+
+    if (compareSummary) {
+      lines.push("", "## Comparison summary", compareSummary);
+    }
+
+    return lines.join("\n");
+  }, [
+    DEMO_GENE_CAP,
+    analystConclusion,
+    compareSummary,
+    dataset,
+    fcThreshold,
+    filteredEdges.length,
+    filteredGenes.length,
+    focusedPathwayGenes,
+    leadPathway,
+    topHubGenes,
+    topShiftGenes,
+    upCount,
+    downCount,
+  ]);
+
+  const openPrintReport = (mode: "report" | "slides") => {
+    const win = window.open("", "_blank", "width=1200,height=900");
+    if (!win) {
+      toast.error("Could not open print window");
+      return;
+    }
+
+    const title = mode === "slides" ? `${dataset.name} deck brief` : `${dataset.name} analysis report`;
+    const sections = reportMarkdown
+      .split("\n\n")
+      .map((block) => `<section>${block.split("\n").map((line) => `<p>${line.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>`).join("")}</section>`)
+      .join("");
+
+    win.document.write(`
+      <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#06101d; color:#edf6ff; margin:0; padding:40px; }
+            .shell { max-width:${mode === "slides" ? "1400px" : "960px"}; margin:0 auto; }
+            .hero { border:1px solid rgba(157,177,211,0.16); border-radius:28px; padding:32px; background:rgba(6,16,29,0.78); margin-bottom:24px; }
+            h1 { margin:0 0 8px; font-size:${mode === "slides" ? "44px" : "34px"}; }
+            h2 { margin:24px 0 12px; font-size:${mode === "slides" ? "28px" : "22px"}; color:#8fecff; }
+            p { margin:8px 0; line-height:1.6; white-space:pre-wrap; }
+            section { border:1px solid rgba(157,177,211,0.12); border-radius:20px; padding:20px; background:rgba(255,255,255,0.03); margin-bottom:16px; }
+            .meta { color:rgba(228,235,247,0.72); }
+            @media print { body { background:white; color:black; } .hero, section { break-inside: avoid; color:black; background:white; border:1px solid #d3d8e0; } h2 { color:#0f4c7a; } }
+          </style>
+        </head>
+        <body>
+          <div class="shell">
+            <div class="hero">
+              <div class="meta">Network Pulse Analyzer</div>
+              <h1>${title}</h1>
+              <p class="meta">${dataset.source} · ${dataset.category} · samples ${dataset.samples}</p>
+              <p>${analystConclusion}</p>
+            </div>
+            ${sections}
+          </div>
+          <script>window.onload = () => { window.print(); };</script>
+        </body>
+      </html>
+    `);
+    win.document.close();
+  };
+
   const exportCSV = () => {
     const rows = [["symbol", "name", "log2FC", "pAdj", "direction"], ...filteredGenes.map((g) => [g.symbol, g.name, g.log2FC, g.pAdj, g.direction])];
     const csv = rows.map((r) => r.join(",")).join("\n");
@@ -180,6 +348,17 @@ const Workspace = () => {
     a.click();
     URL.revokeObjectURL(url);
     toast.success("Exported DEG table");
+  };
+
+  const exportReport = () => {
+    const blob = new Blob([reportMarkdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${dataset.id}-analysis-report.md`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    toast.success("Exported analysis report");
   };
 
   return (
@@ -203,18 +382,31 @@ const Workspace = () => {
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
               Translational view of the cohort: inspect network hubs, differential-expression balance, and pathway candidates from one interactive surface.
             </p>
+            {inferSourceUrl(dataset) ? (
+              <a
+                href={inferSourceUrl(dataset)}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+              >
+                View source evidence <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            ) : null}
           </div>
           <div className="flex items-center gap-2">
             <Select value={dataset.id} onValueChange={(v) => setParams({ dataset: v })}>
               <SelectTrigger className="w-[240px]"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {datasets.map((d) => (
+                {allDatasets.map((d) => (
                   <SelectItem key={d.id} value={d.id}>{d.shortName} — {d.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Button variant="outline" size="sm" onClick={exportCSV}>
               <Download className="h-4 w-4 mr-1.5" /> Export
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportReport}>
+              <FileText className="h-4 w-4 mr-1.5" /> Report
             </Button>
           </div>
         </div>
@@ -357,7 +549,7 @@ const Workspace = () => {
                 <Select value={compareId} onValueChange={setCompareId}>
                   <SelectTrigger><SelectValue placeholder="Choose comparison cohort" /></SelectTrigger>
                   <SelectContent>
-                    {datasets.filter((item) => item.id !== dataset.id).map((item) => (
+                    {allDatasets.filter((item) => item.id !== dataset.id).map((item) => (
                       <SelectItem key={item.id} value={item.id}>
                         {item.shortName} — {item.name}
                       </SelectItem>
@@ -449,6 +641,24 @@ const Workspace = () => {
         </Card>
       </div>
 
+      <div className="px-4 md:px-8 pb-6">
+        <Card className="border-border/60">
+          <CardContent className="p-4">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Demo scope note</div>
+                <p className="mt-2 max-w-4xl text-sm leading-6 text-muted-foreground">
+                  Each reference cohort currently includes the top {DEMO_GENE_CAP} representative DEGs plus a curated interaction and pathway layer for demonstration. This is intentionally a compact analytical slice, not a full untruncated transcriptome export.
+                </p>
+              </div>
+              <Badge variant="secondary" className="px-3 py-1 text-[10px] font-mono">
+                top {DEMO_GENE_CAP} DEG demo layer
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Main grid */}
       <div className="px-4 md:px-8 pb-10 grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-4">
         <Card className="border-border/60 overflow-hidden">
@@ -481,6 +691,8 @@ const Workspace = () => {
                 <TabsTrigger value="genes" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Genes</TabsTrigger>
                 <TabsTrigger value="pathways" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Pathways</TabsTrigger>
                 <TabsTrigger value="insights" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Insights</TabsTrigger>
+                <TabsTrigger value="focus" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Focus</TabsTrigger>
+                <TabsTrigger value="report" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Report</TabsTrigger>
                 <TabsTrigger value="info" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Info</TabsTrigger>
               </TabsList>
 
@@ -558,6 +770,16 @@ const Workspace = () => {
                           </button>
                         ))}
                       </div>
+                      <div className="mt-2">
+                        <a
+                          href={getPathwayEvidenceUrl(p.name, p.source)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 text-[11px] text-primary hover:underline"
+                        >
+                          Open pathway evidence <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
                       <div className="mt-2 text-xs text-muted-foreground">
                         {overlap.length} / {p.genes.length} genes in view
                       </div>
@@ -616,6 +838,14 @@ const Workspace = () => {
                       <div>
                         <div className="text-lg font-semibold text-foreground">{selectedGene.symbol}</div>
                         <div className="text-sm text-muted-foreground">{selectedGene.name}</div>
+                        <a
+                          href={getGeneEvidenceUrl(selectedGene.symbol)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-2 inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+                        >
+                          Gene evidence <ExternalLink className="h-3 w-3" />
+                        </a>
                       </div>
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div className="rounded-xl border border-border/60 bg-white/[0.03] p-3">
@@ -639,10 +869,147 @@ const Workspace = () => {
                           )}
                         </div>
                       </div>
+                      <div>
+                        <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">First-degree neighbors</div>
+                        <div className="mt-2 space-y-2">
+                          {selectedGeneNeighbors.length ? selectedGeneNeighbors.slice(0, 6).map((gene) => (
+                            <button
+                              key={gene.symbol}
+                              onClick={() => setSelected(gene.symbol)}
+                              className="flex w-full items-center justify-between rounded-xl border border-border/60 bg-white/[0.03] px-3 py-2 text-left transition-smooth hover:border-primary/40"
+                            >
+                              <div>
+                                <div className="font-mono font-semibold text-foreground">{gene.symbol}</div>
+                                <div className="text-xs text-muted-foreground">{gene.name}</div>
+                              </div>
+                              <div className="text-right text-xs text-muted-foreground">
+                                <div className="font-mono text-primary">{gene.degree} links</div>
+                                <div>{gene.log2FC.toFixed(2)}</div>
+                              </div>
+                            </button>
+                          )) : (
+                            <span className="text-sm text-muted-foreground">No first-degree neighbors remain in the current filtered graph.</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <div className="mt-3 text-sm text-muted-foreground">Select a gene from the graph, table, or pathway panel to open its current cohort summary.</div>
                   )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="focus" className="m-0 p-4 space-y-4 max-h-[600px] overflow-auto">
+                <div className="rounded-2xl border border-border/60 bg-muted/30 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Pathway-specific focus mode</div>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Narrow the cohort down to one mechanistic pathway and inspect its retained genes, subnetwork edges, and strongest shifts under the current threshold.
+                      </p>
+                    </div>
+                    <div className="w-[240px] max-w-full">
+                      <Select value={focusedPathwayName} onValueChange={setFocusedPathwayName}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="lead">Lead pathway</SelectItem>
+                          {dataset.pathways.map((pathway) => (
+                            <SelectItem key={pathway.name} value={pathway.name}>
+                              {pathway.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-3">
+                  <div className="rounded-2xl border border-border/60 bg-white/[0.03] p-4">
+                    <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                      <ListFilter className="h-3.5 w-3.5 text-primary" />
+                      Focused pathway
+                    </div>
+                    <div className="mt-3 text-lg font-semibold text-foreground">{focusedPathway?.name ?? "No pathway selected"}</div>
+                    <div className="mt-1 text-sm text-muted-foreground">{focusedPathway?.source ?? "N/A"}</div>
+                  </div>
+                  <div className="rounded-2xl border border-border/60 bg-white/[0.03] p-4">
+                    <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                      <GitFork className="h-3.5 w-3.5 text-primary" />
+                      Focus subnetwork
+                    </div>
+                    <div className="mt-3 text-lg font-semibold text-foreground">{focusedPathwayEdges.length} retained edges</div>
+                    <div className="mt-1 text-sm text-muted-foreground">{focusedPathwayGenes.length} pathway genes remain in view</div>
+                  </div>
+                  <div className="rounded-2xl border border-border/60 bg-white/[0.03] p-4">
+                    <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                      <CircleGauge className="h-3.5 w-3.5 text-primary" />
+                      Focus conclusion
+                    </div>
+                    <div className="mt-3 text-sm text-muted-foreground">
+                      {focusedPathway
+                        ? `${focusedPathway.name} retains ${focusedPathwayGenes.length} visible genes and ${focusedPathwayEdges.length} internal edges under the current threshold.`
+                        : "No focus pathway available."}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border/60 bg-muted/30 p-4">
+                  <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Genes driving the focused pathway</div>
+                  <div className="mt-3 space-y-2">
+                    {focusedPathwayGenes.length ? focusedPathwayGenes.map((gene) => (
+                      <button
+                        key={gene.symbol}
+                        onClick={() => setSelected(gene.symbol)}
+                        className="flex w-full items-center justify-between rounded-xl border border-border/60 bg-white/[0.03] px-3 py-3 text-left transition-smooth hover:border-primary/40"
+                      >
+                        <div>
+                          <div className="font-mono font-semibold text-foreground">{gene.symbol}</div>
+                          <div className="text-xs text-muted-foreground">{gene.name}</div>
+                        </div>
+                        <div className="text-right text-xs text-muted-foreground">
+                          <div className={gene.direction === "up" ? "font-mono text-primary" : "font-mono text-magenta"}>
+                            {gene.log2FC > 0 ? "+" : ""}
+                            {gene.log2FC.toFixed(2)}
+                          </div>
+                          <div>adj.P {gene.pAdj.toExponential(1)}</div>
+                        </div>
+                      </button>
+                    )) : (
+                      <div className="text-sm text-muted-foreground">No pathway genes remain after filtering. Lower the threshold or choose another pathway.</div>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="report" className="m-0 p-4 space-y-4 max-h-[600px] overflow-auto">
+                <div className="rounded-2xl border border-border/60 bg-muted/30 p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Exportable report view</div>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        This report summarizes the current cohort, active threshold, lead pathway, dominant hubs, and optional comparison state. Export it as markdown for downstream briefing or documentation.
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={exportReport}>
+                      <Download className="mr-1.5 h-4 w-4" />
+                      Export report
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => openPrintReport("report")}>
+                      <Printer className="mr-1.5 h-4 w-4" />
+                      Print/PDF
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => openPrintReport("slides")}>
+                      <Presentation className="mr-1.5 h-4 w-4" />
+                      Deck brief
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border/60 bg-[hsl(214_68%_7%_/_0.78)] p-4">
+                  <pre className="whitespace-pre-wrap text-xs leading-6 text-muted-foreground">{reportMarkdown}</pre>
                 </div>
               </TabsContent>
 
@@ -668,6 +1035,14 @@ const Workspace = () => {
                   <div className="text-xs uppercase tracking-wider text-muted-foreground">Conclusion</div>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {analystConclusion}
+                  </p>
+                </div>
+                <div className="rounded-md border border-border/60 p-3">
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Demo limitation</div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {dataset.demoGeneCap
+                      ? `This reference program currently includes the top ${dataset.demoGeneCap} representative DEGs rather than a full untruncated gene universe. Use it as an interpretable analytical slice, not as a complete transcriptome readout.`
+                      : "This is a custom cohort, so gene-table scope depends on the rows you supplied through the intake flow."}
                   </p>
                 </div>
                 <p className="text-xs text-muted-foreground">

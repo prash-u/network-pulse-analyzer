@@ -1,6 +1,6 @@
 import { NavLink } from "@/components/NavLink";
 import { Link } from "react-router-dom";
-import { Network, LayoutGrid, Database, FlaskConical, BookOpen, Sparkles } from "lucide-react";
+import { Network, LayoutGrid, Database, FlaskConical, BookOpen, Sparkles, Upload } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +20,7 @@ const main = [
   { title: "Overview", url: "/", icon: LayoutGrid },
   { title: "Workspace", url: "/workspace", icon: Network },
   { title: "Datasets", url: "/datasets", icon: Database },
+  { title: "Intake", url: "/intake", icon: Upload },
   { title: "Methods", url: "/methods", icon: FlaskConical },
   { title: "Docs", url: "/docs", icon: BookOpen },
 ];

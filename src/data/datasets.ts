@@ -9,9 +9,12 @@ export type Disorder = {
   shortName: string;
   category: "Neurodegenerative" | "Metabolic" | "Oncology" | "Infectious" | "Cardiovascular";
   source: string;
+  sourceUrl?: string;
   samples: number;
   description: string;
   color: string; // hsl token suffix
+  demoGeneCap?: number | null;
+  isCustom?: boolean;
   genes: Gene[];
   edges: Edge[];
   pathways: Pathway[];

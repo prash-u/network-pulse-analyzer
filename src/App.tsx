@@ -8,6 +8,7 @@ import Workspace from "./pages/Workspace.tsx";
 import Datasets from "./pages/Datasets.tsx";
 import Methods from "./pages/Methods.tsx";
 import Docs from "./pages/Docs.tsx";
+import Intake from "./pages/Intake.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/workspace" element={<Workspace />} />
           <Route path="/datasets" element={<Datasets />} />
+          <Route path="/intake" element={<Intake />} />
           <Route path="/methods" element={<Methods />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="*" element={<NotFound />} />

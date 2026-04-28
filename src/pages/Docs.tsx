@@ -14,6 +14,7 @@ const Docs = () => {
         <ol className="mt-10 space-y-6">
           {[
             ["Choose a biological program", "Open any reference cohort to preload differentially expressed genes, interaction edges, and ranked pathways."],
+            ["Or upload your own cohort", "Use the Intake surface when you want larger custom DEG tables and optional edge/pathway layers beyond the built-in demo cohorts."],
             ["Focus the signal", "Use the absolute log2 fold-change threshold to remove background genes and concentrate the network on higher-amplitude changes."],
             ["Inspect interaction structure", "Hover or select nodes to highlight local neighbourhoods and understand which genes sit closest to the network core."],
             ["Review pathway evidence", "Open the Pathways tab to compare enriched mechanisms, overlap genes, and p-values without leaving the main workspace."],
@@ -36,6 +37,9 @@ const Docs = () => {
             <h3 className="font-display text-xl font-semibold">Current scope</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               The current product is optimized for curated reference cohorts. It does not yet expose a full custom upload, ID harmonization, or upstream preprocessing flow, so the landing page and workspace intentionally center cohort-based exploration rather than pretending to be a complete omics ingestion platform.
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Each built-in cohort currently contains the top 15 representative DEGs for demonstration, along with a curated interaction and pathway layer. If you need full untruncated gene universes, that should be treated as a later product expansion rather than assumed from the current demo.
             </p>
           </CardContent>
         </Card>
