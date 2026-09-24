@@ -10,6 +10,9 @@ import Methods from "./pages/Methods.tsx";
 import Docs from "./pages/Docs.tsx";
 import Intake from "./pages/Intake.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Discovery from "./pages/Discovery.tsx";
+import Evidence from "./pages/Evidence.tsx";
+import Simulate from "./pages/Simulate.tsx";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +29,9 @@ const App = () => (
           <Route path="/intake" element={<Intake />} />
           <Route path="/methods" element={<Methods />} />
           <Route path="/docs" element={<Docs />} />
+          <Route path="/discovery" element={<Discovery />} />
+          <Route path="/evidence" element={<Evidence />} />
+          <Route path="/simulate" element={<Simulate />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

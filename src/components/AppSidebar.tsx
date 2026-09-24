@@ -1,6 +1,6 @@
 import { NavLink } from "@/components/NavLink";
 import { Link } from "react-router-dom";
-import { Network, LayoutGrid, Database, FlaskConical, BookOpen, Sparkles, Upload } from "lucide-react";
+import { Network, LayoutGrid, Database, FlaskConical, BookOpen, Sparkles, Upload, BrainCircuit, ShieldCheck, Orbit } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +22,9 @@ const main = [
   { title: "Datasets", url: "/datasets", icon: Database },
   { title: "Intake", url: "/intake", icon: Upload },
   { title: "Methods", url: "/methods", icon: FlaskConical },
+  { title: "Discovery", url: "/discovery", icon: BrainCircuit },
+  { title: "Evidence", url: "/evidence", icon: ShieldCheck },
+  { title: "Simulate", url: "/simulate", icon: Orbit },
   { title: "Docs", url: "/docs", icon: BookOpen },
 ];
 
@@ -43,7 +46,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="flex flex-col leading-tight">
               <span className="font-display text-base font-semibold text-sidebar-foreground">Network Pulse</span>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-sidebar-foreground/50">Analyzer</span>
+              <span className="text-[10px] uppercase tracking-[0.28em] text-sidebar-foreground/50">Discovery Engine v2</span>
             </div>
           )}
         </Link>
@@ -102,7 +105,7 @@ export function AppSidebar() {
             <div className="mb-1 flex items-center gap-1.5 font-medium text-sidebar-primary">
               <Sparkles className="h-3 w-3" /> translational build
             </div>
-            Research-grade exploration with clinical and commercial framing.
+            Evidence-first discovery, adversarial hypothesis testing, and counterfactual biology.
           </div>
         ) : (
           <Sparkles className="h-4 w-4 mx-auto text-sidebar-primary" />
