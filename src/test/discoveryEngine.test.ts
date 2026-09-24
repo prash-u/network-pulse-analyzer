@@ -1,24 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe,expect,it } from "vitest";
 import { datasets } from "@/data/datasets";
-import { buildDegreeMap, pathwaySignal, simulateNodeRemoval } from "@/lib/discoveryEngine";
-
-describe("discovery engine", () => {
-  const dataset = datasets[0];
-
-  it("builds deterministic degree counts", () => {
-    const degree = buildDegreeMap(dataset.edges);
-    expect(degree.get("SNCA")).toBeGreaterThan(0);
-  });
-
-  it("removes only edges touching the selected node", () => {
-    const result = simulateNodeRemoval(dataset, "SNCA");
-    expect(result.removedEdges.length).toBeGreaterThan(0);
-    expect(result.remainingEdges.every((edge) => edge.source !== "SNCA" && edge.target !== "SNCA")).toBe(true);
-  });
-
-  it("scores pathway overlap without model reasoning", () => {
-    const result = pathwaySignal(dataset.pathways[0], dataset.genes);
-    expect(result.overlap).toBeGreaterThan(0);
-    expect(result.enrichmentStrength).toBeGreaterThan(0);
-  });
+import { buildDegreeMap,buildEvidenceBundle,buildHypotheses,buildRunManifest,pathwaySignal,rankGenesByNetworkInfluence,simulateNodeRemoval } from "@/lib/discoveryEngine";
+describe("v2 discovery engine",()=>{const d=datasets[0];
+ it("computes degree deterministically",()=>expect(buildDegreeMap(d.edges).get("SNCA")).toBeGreaterThan(0));
+ it("ranks influence",()=>expect(rankGenesByNetworkInfluence(d)[0].influence).toBeGreaterThan(0));
+ it("removes only target edges",()=>{const r=simulateNodeRemoval(d,"SNCA");expect(r.removedEdges.length).toBeGreaterThan(0);expect(r.remainingEdges.every(e=>e.source!=="SNCA"&&e.target!=="SNCA")).toBe(true)});
+ it("scores pathway evidence",()=>expect(pathwaySignal(d.pathways[0],d.genes).score).toBeGreaterThan(0));
+ it("builds traceable evidence",()=>{const e=buildEvidenceBundle(d);expect(e[0].parentIds).toHaveLength(0);expect(e.some(x=>x.kind==="pathway"&&x.parentIds.length>0)).toBe(true)});
+ it("builds adversarial hypotheses",()=>{const h=buildHypotheses(d);expect(h).toHaveLength(3);expect(h.every(x=>x.findings.length===6&&x.evidenceIds.length>0)).toBe(true)});
+ it("builds stable run metadata",()=>expect(buildRunManifest(d).fingerprint).toContain(d.id));
 });
